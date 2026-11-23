@@ -12,8 +12,26 @@ from the WDIO repository before running the suite.
 
 ```sh
 adb -s emulator-5554 install /path/to/apps/android.wdio.native.app.v2.2.0.apk
+```
+
+### Run all six UI Automator tests
+
+```sh
 ANDROID_SERIAL=emulator-5554 make test
 ```
+
+### Run one test method
+
+```sh
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest \
+  '-Pandroid.testInstrumentationRunnerArguments.class=com.example.wdioautomation.tests.lifecycle.WarmResumeTests#formsStateSurvivesHomeAndResume'
+```
+
+Replace the value after `class=` with the fully qualified test class and method
+in `package.ClassName#methodName` format. Omit `#methodName` to run the entire
+class. Replace `emulator-5554` with your device serial from `adb devices`.
+
+### Run a test group
 
 Use `make smoke` for login and signup or `make lifecycle` for the Forms lifecycle
 tests. Both targets accept the same `ANDROID_SERIAL` environment variable.
