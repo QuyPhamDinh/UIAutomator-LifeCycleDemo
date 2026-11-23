@@ -19,6 +19,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    providers.gradleProperty("android.testInstrumentationRunnerArguments.artifactRunId")
+        .orNull
+        ?.let { runId ->
+            require(runId.matches(Regex("[A-Za-z0-9_-]+"))) { "Invalid artifact run ID" }
+            val runDirectory = rootProject.layout.buildDirectory.dir("device-test-results/$runId").get().asFile
+            testOptions {
+                reportDir = runDirectory.resolve("html").path
+                resultsDir = runDirectory.resolve("xml").path
+            }
+        }
+
     buildTypes {
         release {
             optimization {

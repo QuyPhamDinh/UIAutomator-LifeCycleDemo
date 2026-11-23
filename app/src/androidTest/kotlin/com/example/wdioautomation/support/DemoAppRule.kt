@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.example.wdioautomation.screens.components.TabBar
 import java.io.File
+import java.util.UUID
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -27,13 +28,24 @@ internal class DemoAppRule : TestWatcher() {
     override fun failed(error: Throwable, description: Description) {
         runCatching {
             val context = instrumentation.targetContext
-            val root = context.externalMediaDirs.firstOrNull() ?: context.filesDir
-            val directory = File(root, "failures/${description.className}/${description.methodName}")
+            val outputDirectory = InstrumentationRegistry.getArguments().getString("additionalTestOutputDir")
+            val root = outputDirectory?.let(::File)
+                ?: context.externalMediaDirs.firstOrNull()
+                ?: context.filesDir
+            val directory = File(root, "failures/$artifactRunId/${description.className}/${description.methodName}")
             check(directory.isDirectory || directory.mkdirs())
             runCatching {
                 check(device.takeScreenshot(File(directory, "screen.png")))
             }.onFailure { Log.w("DemoAppRule", "Could not capture screenshot", it) }
             device.dumpWindowHierarchy(File(directory, "hierarchy.xml"))
         }.onFailure { Log.w("DemoAppRule", "Could not capture failure artifacts", it) }
+    }
+
+    private companion object {
+        val artifactRunId: String by lazy {
+            InstrumentationRegistry.getArguments().getString("artifactRunId")
+                ?.takeIf { it.matches(Regex("[A-Za-z0-9_-]+")) }
+                ?: UUID.randomUUID().toString()
+        }
     }
 }

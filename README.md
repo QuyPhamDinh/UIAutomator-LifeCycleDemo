@@ -23,7 +23,7 @@ ANDROID_SERIAL=emulator-5554 make test
 ### Run one test method
 
 ```sh
-ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest \
+ANDROID_SERIAL=emulator-5554 bash scripts/run-device-tests.sh ./gradlew :app:connectedDebugAndroidTest \
   '-Pandroid.testInstrumentationRunnerArguments.class=com.example.wdioautomation.tests.lifecycle.WarmResumeTests#formsStateSurvivesHomeAndResume'
 ```
 
@@ -42,11 +42,13 @@ clears. Force-stop is exercised in a separate test.
 
 ## Results and failure artifacts
 
-Gradle writes HTML to `app/build/reports/androidTests/connected/debug/` and XML
-to `app/build/outputs/androidTest-results/connected/debug/`. For a failed test,
-the rule attempts to save a screenshot and UI hierarchy under the host app's
-media directory, grouped by test class and method.
+The runner prints a unique directory under `build/device-test-results/` for each
+invocation. Gradle writes HTML under `html/` and XML under `xml/`. After Gradle
+finishes, the runner collects screenshots and UI hierarchies for failed tests
+under `devices/<gradle-device-name>/<class>/<method>/` within the same run directory.
 
-```sh
-adb -s emulator-5554 pull /sdcard/Android/media/com.example.wdioautomation/failures
-```
+Set `ANDROID_SERIAL` to select one device or leave it unset to collect from all
+connected devices. In CI, archive `build/device-test-results/` even when the test
+command fails. Runs launched directly from Android Studio or Gradle also get
+unique on-device artifact paths. Use the runner commands above for automatic
+collection.

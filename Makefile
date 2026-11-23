@@ -1,14 +1,15 @@
 .PHONY: test smoke lifecycle
 
 GRADLE ?= ./gradlew
+RUN_TESTS := bash scripts/run-device-tests.sh
 TEST_TASK := connectedDebugAndroidTest
 TEST_PACKAGE := com.example.wdioautomation.tests
 
 test:
-	$(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE)
+	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE)
 
 smoke:
-	$(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).authentication
+	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).authentication
 
 lifecycle:
-	$(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).lifecycle
+	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).lifecycle
