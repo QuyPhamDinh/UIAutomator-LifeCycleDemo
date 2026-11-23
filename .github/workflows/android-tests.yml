@@ -25,7 +25,8 @@ jobs:
           java-version: '25'
 
       - name: Install the Android compile SDK
-        run: sdkmanager --install --channel=3 'platforms;android-37'
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install --channel=3 'platforms;android-37'
 
       - name: Download the WDIO demo APK
         run: |
