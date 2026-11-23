@@ -17,24 +17,29 @@ internal class LifecycleActions(private val device: UiDevice, private val contex
         device.waitFor(demoWindow)
     }
 
+    fun mainProcessId(): String =
+        checkNotNull(processIds(includeSecondary = false).singleOrNull()) {
+            "Expected one running main process for $DEMO_PACKAGE"
+        }
+
     fun sendToBackground() {
         check(device.pressHome()) { "Could not press Home" }
-        awaitBackground()
+        awaitDemoWindowGone()
     }
 
     fun openRecents() {
         check(device.pressRecentApps()) { "Could not open Android Recents" }
-        awaitBackground()
+        awaitDemoWindowGone()
     }
 
     fun forceStop() {
         device.executeShellCommand("am force-stop $DEMO_PACKAGE")
-        awaitBackground()
+        awaitDemoWindowGone()
         check(processIds().isEmpty()) { "$DEMO_PACKAGE is still running after force-stop" }
     }
 
     fun killBackgroundProcess() {
-        awaitBackground()
+        awaitDemoWindowGone()
         val initialPids = processIds()
         check(initialPids.isNotEmpty()) { "$DEMO_PACKAGE exited before am kill" }
 
@@ -50,16 +55,19 @@ internal class LifecycleActions(private val device: UiDevice, private val contex
         } while (true)
     }
 
-    private fun awaitBackground() {
+    private fun awaitDemoWindowGone() {
         check(device.wait(Until.gone(demoWindow), UI_TIMEOUT_MS) == true) {
-            "$DEMO_PACKAGE remained in the foreground"
+            "$DEMO_PACKAGE window remained visible"
         }
     }
 
-    private fun processIds(): List<String> =
+    private fun processIds(includeSecondary: Boolean = true): List<String> =
         device.executeShellCommand("ps -A -o PID,NAME").lineSequence()
             .map { it.trim().split(Regex("\\s+"), limit = 2) }
-            .filter { it.size == 2 && (it[1] == DEMO_PACKAGE || it[1].startsWith("$DEMO_PACKAGE:")) }
+            .filter { parts ->
+                parts.size == 2 && (parts[1] == DEMO_PACKAGE ||
+                    (includeSecondary && parts[1].startsWith("$DEMO_PACKAGE:")))
+            }
             .map { it[0] }
             .toList()
 }

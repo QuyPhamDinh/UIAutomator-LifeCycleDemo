@@ -25,10 +25,12 @@ internal class WarmResumeTests {
         forms.enter("Draft before switching")
         forms.setSwitch(true)
 
+        val initialPid = app.lifecycle.mainProcessId()
         app.lifecycle.sendToBackground()
         app.lifecycle.activate()
 
         forms.awaitVisible()
+        assertEquals("WDIO main process changed during warm resume", initialPid, app.lifecycle.mainProcessId())
         assertEquals("Draft before switching", forms.inputText)
         assertTrue(forms.isOn)
         forms.setSwitch(false)
@@ -42,10 +44,12 @@ internal class WarmResumeTests {
         forms.enter("Android draft")
         forms.setSwitch(true)
 
+        val initialPid = app.lifecycle.mainProcessId()
         app.lifecycle.openRecents()
         app.lifecycle.activate()
 
         forms.awaitVisible()
+        assertEquals("WDIO main process changed during warm resume", initialPid, app.lifecycle.mainProcessId())
         assertEquals("Android draft", forms.inputText)
         assertTrue(forms.isOn)
     }
