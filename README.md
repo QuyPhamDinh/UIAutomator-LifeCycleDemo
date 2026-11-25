@@ -42,6 +42,18 @@ Replace the value after `class=` with the fully qualified test class and method
 in `package.ClassName#methodName` format. Omit `#methodName` to run the entire
 class. Replace `emulator-5554` with your device serial from `adb devices`.
 
+### Override the target package or UI timeout
+
+The default target is `com.wdiodemoapp` and the default UI wait is 10,000 ms.
+For another installed build with the same selectors and behavior, pass its
+package name and a positive timeout in milliseconds as instrumentation arguments.
+
+```sh
+ANDROID_SERIAL=emulator-5554 bash scripts/run-device-tests.sh ./gradlew :app:connectedDebugAndroidTest \
+  '-Pandroid.testInstrumentationRunnerArguments.demoPackage=com.example.wdio.qa' \
+  '-Pandroid.testInstrumentationRunnerArguments.uiTimeoutMs=15000'
+```
+
 ### Run a test group
 
 Use `make smoke` for login and signup or `make lifecycle` for the Forms lifecycle
@@ -59,7 +71,7 @@ ANDROID_SERIAL=emulator-5554 bash scripts/run-device-tests.sh ./gradlew :app:con
 ```
 
 Home tests check readable content, accessible names on clickable controls,
-48 × 48 dp visible touch targets for primary tabs, selected states, and
+48 × 48 dp visible touch targets for the primary tabs and Menu, selected states, and
 navigation. A separate Forms test checks text entry and the switch at 200% font
 scale and waits for the previous device setting to take effect after the test.
 Failure screenshots are captured before restoration so you can inspect the

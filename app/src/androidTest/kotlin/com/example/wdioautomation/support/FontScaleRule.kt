@@ -7,6 +7,8 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
+private const val FONT_SCALE_APPLY_TIMEOUT_MS = 5_000L
+
 internal class FontScaleRule(private val device: UiDevice, private val scale: Float) : TestRule {
     override fun apply(base: Statement, description: Description): Statement = object : Statement() {
         override fun evaluate() {
@@ -45,7 +47,7 @@ internal class FontScaleRule(private val device: UiDevice, private val scale: Fl
         }
         device.executeShellCommand(command)
 
-        val deadline = SystemClock.elapsedRealtime() + 5_000L
+        val deadline = SystemClock.elapsedRealtime() + FONT_SCALE_APPLY_TIMEOUT_MS
         while (SystemClock.elapsedRealtime() < deadline) {
             if (resources.configuration.fontScale == expected && readSetting() == setting) return
             SystemClock.sleep(100)

@@ -38,15 +38,28 @@ internal class HomeAccessibilityTests {
         HomeScreen(app.device).awaitVisible()
         val tabs = TabBar(app.device)
         for (label in listOf("Home", "Login", "Forms")) {
-            val (focusable, clickable, widthDp, heightDp) = tabs.inspect(label)
-            assertTrue("$label should be focusable", focusable)
-            assertTrue("$label should be clickable", clickable)
-            assertTrue(
-                String.format(Locale.ROOT, "%s visible touch target is %.1f × %.1f dp, expected 48 × 48 dp",
-                    label, widthDp, heightDp),
-                widthDp >= 47.5f && heightDp >= 47.5f,
-            )
+            assertUsableTouchTarget(tabs, label)
         }
+    }
+
+    @Test
+    fun menuHasUsableTouchTarget() {
+        HomeScreen(app.device).awaitVisible()
+        assertUsableTouchTarget(TabBar(app.device), "Menu")
+    }
+
+    private fun assertUsableTouchTarget(tabs: TabBar, label: String) {
+        val (focusable, clickable, widthDp, heightDp) = tabs.inspect(label)
+        assertTrue("$label should be focusable", focusable)
+        assertTrue("$label should be clickable", clickable)
+        assertTrue(
+            String.format(
+                Locale.ROOT,
+                "%s visible touch target is %.1f × %.1f dp, expected 48 × 48 dp",
+                label, widthDp, heightDp,
+            ),
+            widthDp >= 47.5f && heightDp >= 47.5f,
+        )
     }
 
     @Test

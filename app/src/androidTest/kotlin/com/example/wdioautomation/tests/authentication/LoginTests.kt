@@ -15,10 +15,10 @@ internal class LoginTests {
 
     @Test
     fun successfulLogin() {
-        val login = LoginScreen(app.device)
+        val loginScreen = LoginScreen(app.device)
         val alert = AlertComponent(app.device)
-        login.open()
-        login.submit("test@webdriver.io", "Test1234!")
+        loginScreen.open()
+        loginScreen.login(TestUsers.EMAIL, TestUsers.PASSWORD)
         alert.assertContains("Success")
         alert.dismiss()
     }

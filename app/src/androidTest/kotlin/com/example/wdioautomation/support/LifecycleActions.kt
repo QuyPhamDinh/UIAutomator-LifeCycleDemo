@@ -6,6 +6,8 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 
+private const val PROCESS_KILL_TIMEOUT_MS = 12_000L
+
 internal class LifecycleActions(private val device: UiDevice, private val context: Context) {
     private val demoWindow = By.pkg(DEMO_PACKAGE).depth(0)
 
@@ -43,7 +45,7 @@ internal class LifecycleActions(private val device: UiDevice, private val contex
         val initialPids = processIds()
         check(initialPids.isNotEmpty()) { "$DEMO_PACKAGE exited before am kill" }
 
-        val deadline = SystemClock.elapsedRealtime() + 12_000L
+        val deadline = SystemClock.elapsedRealtime() + PROCESS_KILL_TIMEOUT_MS
         do {
             device.executeShellCommand("am kill $DEMO_PACKAGE")
             val remainingPids = processIds()
