@@ -71,8 +71,11 @@ announcements, and swipe focus order.
 
 The Android UI Automator workflow runs the full suite on pull requests and
 pushes to `main`. You can also start it from the repository’s **Actions** tab.
-It installs the WDIO APK on an Android 16 emulator and uploads the reports and
-any captured failure artifacts as `android-ui-automator-results`.
+It installs the WDIO APK on an Android 16 emulator with the Pixel 2 hardware
+profile and uploads the reports and any captured failure artifacts as
+`android-ui-automator-results`. This profile provides a wider baseline for the
+48 dp touch-target check. WDIO v2.2.0 can still expose undersized tabs on a
+320 dp-wide device.
 
 ## Results and failure artifacts
 
