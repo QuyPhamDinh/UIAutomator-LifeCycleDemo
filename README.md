@@ -94,16 +94,18 @@ announcements, and swipe focus order.
 
 ## GitHub Actions
 
-The Android UI Automator workflow runs the full suite on pull requests and
-pushes to `main`. To run a subset, open the workflow in the repository’s
-**Actions** tab, select **Run workflow**, and choose `smoke` or `lifecycle`.
-The `test` option runs the full suite. All CI suites use Android Test
-Orchestrator, which starts a fresh instrumentation process for each test.
-It installs the WDIO APK on an Android 16 emulator with the Pixel 2 hardware
-profile and uploads the reports and any captured failure artifacts as
-`android-ui-automator-results`. This profile provides a wider baseline for the
-48 dp touch-target check. WDIO v2.2.0 can still expose undersized tabs on a
-320 dp-wide device.
+The Android UI Automator workflow runs the full suite on API 36 for pull
+requests and on API 30, 34, and 36 for pushes to `main`. To run a subset on
+API 36, open the workflow in the repository’s **Actions** tab, select
+**Run workflow**, and choose `smoke` or `lifecycle`. The `test` option runs the
+full suite. All CI suites use Android Test Orchestrator, which starts a fresh
+instrumentation process for each test.
+
+CI reuses Gradle caches and restores clean Pixel 2 emulator snapshots by API
+level when available. Each job installs WDIO after boot and uploads its reports
+and failure artifacts as `android-ui-automator-results-api-<level>`. The Pixel
+2 profile provides a wider baseline for the 48 dp touch-target check. WDIO
+v2.2.0 can still expose undersized tabs on a 320 dp-wide device.
 
 ## Results and failure artifacts
 
