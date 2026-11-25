@@ -25,6 +25,11 @@ internal class FormsScreen(private val device: UiDevice) {
         device.waitFor(By.desc("Forms-screen").pkg(DEMO_PACKAGE))
     }
 
+    fun focusInput() {
+        device.waitFor(By.desc("text-input").pkg(DEMO_PACKAGE).clickable(true).enabled(true)).click()
+        device.waitFor(By.desc("text-input").pkg(DEMO_PACKAGE).focused(true))
+    }
+
     fun enter(text: String) {
         device.waitFor(textInput).text = text
     }

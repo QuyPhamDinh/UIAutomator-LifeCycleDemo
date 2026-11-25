@@ -6,6 +6,46 @@ run_dir=$(mktemp -d "build/device-test-results/$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX
 run_id=${run_dir##*/}
 printf 'Device test results: %s\n' "$run_dir"
 
+# Preserve existing device settings if instrumentation exits before its rule can restore them.
+sdk_dir=${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}
+adb_bin=${ADB:-$(command -v adb || printf '%s' "$sdk_dir/platform-tools/adb")}
+snapshot_count=0
+
+restore_font_scales() {
+    for (( index = 0; index < snapshot_count; index++ )); do
+        serial=${serials[index]}
+        original=${font_scales[index]}
+        current=$("$adb_bin" -s "$serial" shell settings get system font_scale) || continue
+        current=${current//$'\r'/}
+        [[ "$current" == 2.0 && "$current" != "$original" ]] || continue
+
+        if [[ "$original" == null ]]; then
+            "$adb_bin" -s "$serial" shell settings delete system font_scale ||
+                printf 'Could not restore the font scale on %s\n' "$serial" >&2
+        else
+            "$adb_bin" -s "$serial" shell settings put system font_scale "$original" ||
+                printf 'Could not restore the font scale on %s\n' "$serial" >&2
+        fi
+    done
+}
+
+if [[ -x "$adb_bin" ]]; then
+    while read -r serial state _; do
+        [[ "$state" == device ]] || continue
+        [[ -z "${ANDROID_SERIAL:-}" || "$serial" == "$ANDROID_SERIAL" ]] || continue
+        original=$("$adb_bin" -s "$serial" shell settings get system font_scale) || continue
+        original=${original//$'\r'/}
+        [[ "$original" == null || "$original" =~ ^[0-9]+([.][0-9]+)?$ ]] || continue
+        serials[snapshot_count]=$serial
+        font_scales[snapshot_count]=$original
+        snapshot_count=$((snapshot_count + 1))
+    done < <("$adb_bin" devices)
+fi
+
+trap restore_font_scales EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 gradle_status=0
 "$@" -Pandroid.enableAdditionalTestOutput=true \
     "-Pandroid.testInstrumentationRunnerArguments.artifactRunId=$run_id" || gradle_status=$?

@@ -3,7 +3,7 @@
 Kotlin UI Automator tests drive the separately installed WDIO Android demo
 (`com.wdiodemoapp`). The `app` module hosts AndroidJUnitRunner. The suite covers
 successful login and signup, Forms state after Home and Recents, state after
-background process death, and state after a force-stop.
+background process death, state after a force-stop, and Home accessibility.
 
 ## Install the WDIO demo app
 
@@ -25,7 +25,7 @@ installs the test harness and instrumentation APK when you run the suite.
 
 ## Run the tests
 
-### Run all six UI Automator tests
+### Run all UI Automator tests
 
 ```sh
 ANDROID_SERIAL=emulator-5554 make test
@@ -50,6 +50,22 @@ Recents resumes through the app's launcher intent so the test does not depend on
 the launcher card's layout. The process-death test requires the system to kill
 the background process with `am kill`, then checks that the temporary state
 clears. Force-stop is exercised in a separate test.
+
+### Run the accessibility tests
+
+```sh
+ANDROID_SERIAL=emulator-5554 bash scripts/run-device-tests.sh ./gradlew :app:connectedDebugAndroidTest \
+  '-Pandroid.testInstrumentationRunnerArguments.package=com.example.wdioautomation.tests.accessibility'
+```
+
+Home tests check readable content, accessible names on clickable controls,
+48 × 48 dp visible touch targets for primary tabs, selected states, and
+navigation. A separate Forms test checks text entry and the switch at 200% font
+scale and waits for the previous device setting to take effect after the test.
+Failure screenshots are captured before restoration so you can inspect the
+large-text layout. The test verifies interaction. Review screenshots separately
+for clipping and overlap, and use separate checks for contrast, TalkBack
+announcements, and swipe focus order.
 
 ## GitHub Actions
 
