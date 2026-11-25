@@ -10,8 +10,9 @@ import com.example.wdioautomation.support.waitFor
 import org.junit.Assert.assertNotNull
 
 internal class FormsScreen(private val device: UiDevice) {
-    private val textInput = By.desc("text-input").pkg(DEMO_PACKAGE)
-    private val formSwitch = By.desc("switch").pkg(DEMO_PACKAGE)
+    private val screen = By.desc("Forms-screen").pkg(DEMO_PACKAGE)
+    private val textInput get() = By.desc("text-input").pkg(DEMO_PACKAGE)
+    private val formSwitch get() = By.desc("switch").pkg(DEMO_PACKAGE)
     val inputText: String get() = device.waitFor(textInput).text.orEmpty()
     val isInputEmpty: Boolean get() = inputText.let { it.isEmpty() || it == "Type something" }
     val isOn: Boolean get() = device.waitFor(formSwitch).isChecked
@@ -22,12 +23,12 @@ internal class FormsScreen(private val device: UiDevice) {
     }
 
     fun awaitVisible() {
-        device.waitFor(By.desc("Forms-screen").pkg(DEMO_PACKAGE))
+        device.waitFor(screen)
     }
 
     fun focusInput() {
-        device.waitFor(By.desc("text-input").pkg(DEMO_PACKAGE).clickable(true).enabled(true)).click()
-        device.waitFor(By.desc("text-input").pkg(DEMO_PACKAGE).focused(true))
+        device.waitFor(textInput.clickable(true).enabled(true)).click()
+        device.waitFor(textInput.focused(true))
     }
 
     fun enter(text: String) {
@@ -39,7 +40,7 @@ internal class FormsScreen(private val device: UiDevice) {
         if (toggle.isChecked != on) toggle.click()
         assertNotNull(
             "The Forms switch did not reach checked=$on",
-            device.wait(Until.findObject(By.desc("switch").pkg(DEMO_PACKAGE).checked(on)), UI_TIMEOUT_MS),
+            device.wait(Until.findObject(formSwitch.checked(on)), UI_TIMEOUT_MS),
         )
     }
 }
