@@ -31,6 +31,18 @@ installs the test harness and instrumentation APK when you run the suite.
 ANDROID_SERIAL=emulator-5554 make test
 ```
 
+### Run with Android Test Orchestrator
+
+To isolate instrumentation crashes, opt in through the runner so all test
+processes receive the same artifact run ID.
+
+```sh
+ANDROID_SERIAL=emulator-5554 make test GRADLE='./gradlew -PuseTestOrchestrator=true'
+```
+
+Orchestrator starts a fresh instrumentation process for each test. The suite
+uses its existing WDIO lifecycle rule for app setup.
+
 ### Run one test method
 
 ```sh
@@ -85,7 +97,8 @@ announcements, and swipe focus order.
 The Android UI Automator workflow runs the full suite on pull requests and
 pushes to `main`. To run a subset, open the workflow in the repository’s
 **Actions** tab, select **Run workflow**, and choose `smoke` or `lifecycle`.
-The `test` option runs the full suite.
+The `test` option runs the full suite. All CI suites use Android Test
+Orchestrator, which starts a fresh instrumentation process for each test.
 It installs the WDIO APK on an Android 16 emulator with the Pixel 2 hardware
 profile and uploads the reports and any captured failure artifacts as
 `android-ui-automator-results`. This profile provides a wider baseline for the

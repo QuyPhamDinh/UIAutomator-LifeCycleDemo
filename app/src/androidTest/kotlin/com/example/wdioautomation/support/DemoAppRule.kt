@@ -49,7 +49,12 @@ internal class DemoAppRule : TestWatcher() {
     private companion object {
         val artifactRunId: String by lazy {
             InstrumentationRegistry.getArguments().getString("artifactRunId")
-                ?.takeIf { it.matches(Regex("[A-Za-z0-9_-]+")) }
+                ?.takeIf { runId ->
+                    val assets = InstrumentationRegistry.getInstrumentation().context.assets
+                    val pattern = assets.open("artifact-run-id-pattern.txt").bufferedReader()
+                        .use { it.readText().trim().toRegex() }
+                    pattern.matches(runId)
+                }
                 ?: UUID.randomUUID().toString()
         }
     }

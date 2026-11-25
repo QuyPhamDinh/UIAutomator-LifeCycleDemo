@@ -64,7 +64,7 @@ jobs:
             adb shell wm size
             adb shell wm density
             adb install -r "$RUNNER_TEMP/android.wdio.native.app.v2.2.0.apk"
-            make "$TEST_SUITE"
+            make "$TEST_SUITE" GRADLE='./gradlew -PuseTestOrchestrator=true'
 
       - name: Upload test reports and failure artifacts
         if: always()

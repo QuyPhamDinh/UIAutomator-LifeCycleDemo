@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
 }
+
+val useTestOrchestrator = providers.gradleProperty("useTestOrchestrator").orNull == "true"
 
 android {
     namespace = "com.example.wdioautomation"
@@ -22,7 +23,9 @@ android {
     providers.gradleProperty("android.testInstrumentationRunnerArguments.artifactRunId")
         .orNull
         ?.let { runId ->
-            require(runId.matches(Regex("[A-Za-z0-9_-]+"))) { "Invalid artifact run ID" }
+            val patternFile = layout.projectDirectory.file("src/androidTest/assets/artifact-run-id-pattern.txt")
+            val runIdPattern = providers.fileContents(patternFile).asText.get().trim().toRegex()
+            require(runIdPattern.matches(runId)) { "Invalid artifact run ID" }
             val runDirectory = rootProject.layout.buildDirectory.dir("device-test-results/$runId").get().asFile
             testOptions {
                 reportDir = runDirectory.resolve("html").path
@@ -30,39 +33,24 @@ android {
             }
         }
 
-    buildTypes {
-        release {
-            optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
-            }
+    testOptions {
+        animationsDisabled = true
+        if (useTestOrchestrator) {
+            execution = "ANDROIDX_TEST_ORCHESTRATOR"
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.uiautomator)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    if (useTestOrchestrator) {
+        androidTestUtil(libs.androidx.test.orchestrator)
+    }
 }
