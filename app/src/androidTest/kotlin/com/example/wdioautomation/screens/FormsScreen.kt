@@ -7,14 +7,18 @@ import com.example.wdioautomation.screens.components.TabBar
 import com.example.wdioautomation.support.DEMO_PACKAGE
 import com.example.wdioautomation.support.UI_TIMEOUT_MS
 import com.example.wdioautomation.support.waitFor
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+
+private const val INPUT_HINT = "Type something"
 
 internal class FormsScreen(private val device: UiDevice) {
     private val screen = By.desc("Forms-screen").pkg(DEMO_PACKAGE)
     private val textInput get() = By.desc("text-input").pkg(DEMO_PACKAGE)
     private val formSwitch get() = By.desc("switch").pkg(DEMO_PACKAGE)
     val inputText: String get() = device.waitFor(textInput).text.orEmpty()
-    val isInputEmpty: Boolean get() = inputText.let { it.isEmpty() || it == "Type something" }
+    val isInputEmpty: Boolean get() = inputText.let { it.isEmpty() || it == INPUT_HINT }
     val isOn: Boolean get() = device.waitFor(formSwitch).isChecked
 
     fun open() {
@@ -33,6 +37,18 @@ internal class FormsScreen(private val device: UiDevice) {
 
     fun enter(text: String) {
         device.waitFor(textInput).text = text
+    }
+
+    fun fillDraft(text: String) {
+        enter(text)
+        setSwitch(true)
+        assertEquals("Draft must be present before relaunch", text, inputText)
+    }
+
+    fun assertStateCleared() {
+        val draft = inputText
+        assertEquals("Forms draft after relaunch", "", if (draft == INPUT_HINT) "" else draft)
+        assertFalse("Forms switch should be off after relaunch", isOn)
     }
 
     fun setSwitch(on: Boolean) {
