@@ -9,7 +9,7 @@ test:
 	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE)
 
 smoke:
-	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).authentication
+	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.annotation=$(TEST_PACKAGE).Smoke
 
 lifecycle:
-	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.package=$(TEST_PACKAGE).lifecycle
+	$(RUN_TESTS) $(GRADLE) $(TEST_TASK) -Pandroid.testInstrumentationRunnerArguments.annotation=$(TEST_PACKAGE).Lifecycle

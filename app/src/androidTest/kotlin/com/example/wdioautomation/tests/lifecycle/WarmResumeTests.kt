@@ -6,10 +6,12 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import com.example.wdioautomation.support.DemoAppRule
+import com.example.wdioautomation.tests.Lifecycle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Lifecycle
 @RunWith(AndroidJUnit4::class)
 internal class WarmResumeTests {
     @get:Rule

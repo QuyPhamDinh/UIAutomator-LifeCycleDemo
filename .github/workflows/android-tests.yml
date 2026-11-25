@@ -5,6 +5,15 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      suite:
+        description: Test suite to run
+        type: choice
+        default: test
+        options:
+          - test
+          - smoke
+          - lifecycle
 
 permissions:
   contents: read
@@ -43,6 +52,8 @@ jobs:
 
       - name: Install WDIO and run the suite
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_SUITE: ${{ inputs.suite || 'test' }}
         with:
           api-level: 36
           target: google_apis
@@ -53,7 +64,7 @@ jobs:
             adb shell wm size
             adb shell wm density
             adb install -r "$RUNNER_TEMP/android.wdio.native.app.v2.2.0.apk"
-            make test
+            make "$TEST_SUITE"
 
       - name: Upload test reports and failure artifacts
         if: always()

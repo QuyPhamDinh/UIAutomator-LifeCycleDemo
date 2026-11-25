@@ -37,7 +37,12 @@ internal class DemoAppRule : TestWatcher() {
             runCatching {
                 check(device.takeScreenshot(File(directory, "screen.png")))
             }.onFailure { Log.w("DemoAppRule", "Could not capture screenshot", it) }
-            device.dumpWindowHierarchy(File(directory, "hierarchy.xml"))
+            runCatching {
+                device.dumpWindowHierarchy(File(directory, "hierarchy.xml"))
+            }.onFailure { Log.w("DemoAppRule", "Could not capture UI hierarchy", it) }
+            runCatching {
+                File(directory, "logcat.txt").writeText(device.executeShellCommand("logcat -d -t 500"))
+            }.onFailure { Log.w("DemoAppRule", "Could not capture logcat", it) }
         }.onFailure { Log.w("DemoAppRule", "Could not capture failure artifacts", it) }
     }
 

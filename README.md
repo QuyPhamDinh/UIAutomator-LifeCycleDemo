@@ -57,7 +57,8 @@ ANDROID_SERIAL=emulator-5554 bash scripts/run-device-tests.sh ./gradlew :app:con
 ### Run a test group
 
 Use `make smoke` for login and signup or `make lifecycle` for the Forms lifecycle
-tests. Both targets accept the same `ANDROID_SERIAL` environment variable.
+tests. The runner selects tests marked `@Smoke` or `@Lifecycle`, respectively.
+Both targets accept the same `ANDROID_SERIAL` environment variable.
 Recents resumes through the app's launcher intent so the test does not depend on
 the launcher card's layout. The process-death test requires the system to kill
 the background process with `am kill`, then checks that the temporary state
@@ -82,7 +83,9 @@ announcements, and swipe focus order.
 ## GitHub Actions
 
 The Android UI Automator workflow runs the full suite on pull requests and
-pushes to `main`. You can also start it from the repository’s **Actions** tab.
+pushes to `main`. To run a subset, open the workflow in the repository’s
+**Actions** tab, select **Run workflow**, and choose `smoke` or `lifecycle`.
+The `test` option runs the full suite.
 It installs the WDIO APK on an Android 16 emulator with the Pixel 2 hardware
 profile and uploads the reports and any captured failure artifacts as
 `android-ui-automator-results`. This profile provides a wider baseline for the
@@ -93,7 +96,8 @@ profile and uploads the reports and any captured failure artifacts as
 
 The runner prints a unique directory under `build/device-test-results/` for each
 invocation. Gradle writes HTML under `html/` and XML under `xml/`. After Gradle
-finishes, the runner collects screenshots and UI hierarchies for failed tests
+finishes, the runner collects screenshots, UI hierarchies, and the last 500
+logcat lines for failed tests
 under `devices/<gradle-device-name>/<class>/<method>/` within the same run directory.
 
 Set `ANDROID_SERIAL` to select one device or leave it unset to collect from all
