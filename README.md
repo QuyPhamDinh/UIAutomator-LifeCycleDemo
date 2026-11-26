@@ -101,8 +101,9 @@ API 36, open the workflow in the repository’s **Actions** tab, select
 full suite. All CI suites use Android Test Orchestrator, which starts a fresh
 instrumentation process for each test.
 
-CI reuses Gradle caches and restores clean Pixel 2 emulator snapshots by API
-level when available. Each job installs WDIO after boot and uploads its reports
+CI reuses Gradle caches and restores clean Pixel 2 emulator snapshots on APIs
+34 and 36 when available. API 30 cold-boots to avoid the input service failure
+seen after snapshot restore. Each job installs WDIO after boot and uploads its reports
 and failure artifacts as `android-ui-automator-results-api-<level>`. The Pixel
 2 profile provides a wider baseline for the 48 dp touch-target check. WDIO
 v2.2.0 can still expose undersized tabs on a 320 dp-wide device.

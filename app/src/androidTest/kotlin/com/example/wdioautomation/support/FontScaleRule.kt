@@ -49,7 +49,13 @@ internal class FontScaleRule(private val device: UiDevice, private val scale: Fl
 
         val deadline = SystemClock.elapsedRealtime() + FONT_SCALE_APPLY_TIMEOUT_MS
         while (SystemClock.elapsedRealtime() < deadline) {
-            if (resources.configuration.fontScale == expected && readSetting() == setting) return
+            if (resources.configuration.fontScale == expected) {
+                val currentSetting = readSetting()
+                // Android can write the effective default back after a setting is deleted.
+                if (currentSetting == setting || (setting == "null" && currentSetting.toFloatOrNull() == expected)) {
+                    return
+                }
+            }
             SystemClock.sleep(100)
         }
         error("Expected font scale $expected (setting $setting), found " +

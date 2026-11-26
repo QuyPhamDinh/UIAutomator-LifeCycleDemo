@@ -66,6 +66,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Restore the emulator snapshot
+        if: matrix.api-level != 30
         id: avd-cache
         uses: actions/cache/restore@v5
         with:
@@ -75,7 +76,7 @@ jobs:
           key: avd-v1-${{ runner.os }}-24.04-api-${{ matrix.api-level }}-google_apis-x86_64-pixel_2
 
       - name: Generate a clean emulator snapshot
-        if: steps.avd-cache.outputs.cache-hit != 'true'
+        if: matrix.api-level != 30 && steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -88,7 +89,7 @@ jobs:
           script: 'echo Clean AVD snapshot ready'
 
       - name: Cache the clean emulator snapshot
-        if: github.ref == 'refs/heads/main' && steps.avd-cache.outputs.cache-hit != 'true'
+        if: matrix.api-level != 30 && github.ref == 'refs/heads/main' && steps.avd-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
           path: |
@@ -106,7 +107,9 @@ jobs:
           arch: x86_64
           profile: pixel_2
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: >-
+            ${{ matrix.api-level == 30 && '-no-snapshot' || '-no-snapshot-save' }}
+            -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
             adb shell wm size
