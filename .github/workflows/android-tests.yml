@@ -43,7 +43,10 @@ jobs:
           java-version: '25'
 
       - name: Set up Gradle caching
-        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c
+        
+      - name: Diagnose Gradle plugin resolution
+        run: ./gradlew help --info --stacktrace# v5
 
       - name: Install the Android compile SDK
         run: |
